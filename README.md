@@ -8,7 +8,51 @@ On 64-bit Windows, download the versioned executable from the repository’s **R
 
 ### Run from source
 
-Install Python 3.10 or newer with Tk. Run `python dxspider.py` from this directory (on macOS or Linux, use `python3 dxspider.py`). Linux distributions may package Tk separately, for example as `python3-tk`.
+Install Python 3.10 or newer with Tk. Run the commands below from this repository's directory.
+
+#### Windows
+
+If running from source instead of using the bundled executable, install Python with Tk support, then run `python dxspider.py`.
+
+#### macOS
+
+Use a current Python with its own Tk installation. Apple's system/Xcode Python can load deprecated Tk 8.5, which may show blank windows or invisible widgets on newer macOS versions, including Tahoe.
+
+With [Homebrew](https://brew.sh/), install Python and its matching Tk package:
+
+```sh
+brew install python@3.14 python-tk@3.14
+"$(brew --prefix python@3.14)/bin/python3.14" -m tkinter
+```
+
+The second command opens a small Tk test window. Check that its buttons are visible, close it, then launch the app:
+
+```sh
+"$(brew --prefix python@3.14)/bin/python3.14" dxspider.py
+```
+
+The explicit interpreter path avoids accidentally selecting Apple's Python. Alternatively, install a current macOS Python from [python.org](https://www.python.org/downloads/macos/), which includes its own Tk, and use that interpreter to run the app.
+
+If you see `DEPRECATION WARNING: The system version of Tk is deprecated`, switch to one of these Python installations. Setting `TK_SILENCE_DEPRECATION=1` only hides the warning; it does not fix rendering. See [Python's macOS Tk guidance](https://www.python.org/download/mac/tcltk/). Changing Python installations does not require deleting your saved scripts or settings.
+
+#### Linux
+
+Install your distribution's Python and matching Tk package. For example, on Ubuntu or Debian:
+
+```sh
+sudo apt install python3 python3-tk
+python3 -m tkinter
+```
+
+Use a distribution version that provides Python 3.10 or newer. Check that the Tk test window renders correctly, close it, then run:
+
+```sh
+python3 dxspider.py
+```
+
+Other distributions may use a different package name for Tk. Run the app in a graphical desktop session; Tk needs a display.
+
+## Using the app
 
 1. Open **Settings**, enter your login callsign, and save. The initial node address is `w3lpl.net:7373`. Enter a DNS name or IP address, optionally followed by a port. Omitting the port uses 23. For IPv6 with a port, use brackets, for example `[2001:db8::1]:7373`. Saving checks DNS names with your system resolver. The app remembers the host, port, callsign, macro values, and script library in your user configuration directory.
 2. Choose a starter script or click **New** for an ad-hoc one. Type one node command per line. Blank lines are skipped. **Save** updates the library, while **Save as…** creates a named copy.
