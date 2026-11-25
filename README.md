@@ -10,7 +10,7 @@ On 64-bit Windows, download **DXSpider-Filters-Windows-x64.exe** from the reposi
 
 Install Python 3.10 or newer with Tk. Run `python dxspider.py` from this directory (on macOS or Linux, use `python3 dxspider.py`). Linux distributions may package Tk separately, for example as `python3-tk`.
 
-1. Open **Settings**, enter your login callsign, and save. The default node is `w3lpl.net:7373`. The app remembers the host, port, callsign, macro values, and script library in your user configuration directory.
+1. Open **Settings**, enter your login callsign, and save. The initial node address is `w3lpl.net:7373`. Enter a DNS name or IP address, optionally followed by a port. Omitting the port uses 23. For IPv6 with a port, use brackets, for example `[2001:db8::1]:7373`. Saving checks DNS names with your system resolver. The app remembers the host, port, callsign, macro values, and script library in your user configuration directory.
 2. Choose a starter script or click **New** for an ad-hoc one. Type one node command per line. Blank lines are skipped. **Save** updates the library, while **Save as…** creates a named copy.
 3. **Preview** displays expanded commands. **Copy expanded commands** puts them on the clipboard for use in N1MM or a terminal.
 4. Click **Apply** to open a callsign-only Telnet session. The app sends the visible editor contents one command at a time, waiting for your callsign's DXSpider prompt between commands. It closes the socket after the final reply, an error, or a timeout.

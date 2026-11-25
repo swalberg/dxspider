@@ -22,4 +22,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Run unit tests
+        if: runner.os != 'Linux'
         run: python -m unittest discover -v
+      - name: Run unit tests with a virtual display
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python -m unittest discover -v

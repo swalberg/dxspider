@@ -10,6 +10,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from capture import capture_configuration
 from library import NAME, defaults, expand, save, settings_file
+from node_address import format_address, validate_address
 from session import apply_commands
 
 
@@ -62,7 +63,7 @@ class App:
 
     def show_destination(self):
         c = self.config
-        self.destination.config(text=f"{c['call'] or 'Set callsign'}  @  {c['host']}:{c['port']}")
+        self.destination.config(text=f"{c['call'] or 'Set callsign'}  @  {format_address(c['host'], c['port'])}")
 
     def content(self):
         return self.editor.get("1.0", "end-1c")
@@ -174,7 +175,7 @@ class App:
         self.apply_button.state(["disabled"])
         self.capture_button.state(["disabled"])
         self.status.configure(text="Reading configuration…" if capture else "Applying script…")
-        self.log(f"{c['call']} @ {c['host']}:{c['port']}", clear=True)
+        self.log(f"{c['call']} @ {format_address(c['host'], c['port'])}", clear=True)
 
         def work():
             def report(msg):
@@ -235,13 +236,16 @@ class Settings:
         panel = ttk.Frame(self.window, padding=16)
         panel.pack(fill="both", expand=True)
         self.fields = {}
-        for row, (key, label) in enumerate([("host", "Node host"), ("port", "Port"),
-                                            ("call", "Login callsign")]):
+        address = format_address(app.config["host"], app.config["port"])
+        for row, (key, label, value) in enumerate([("address", "Node address", address),
+                                                   ("call", "Login callsign", app.config["call"])]):
             ttk.Label(panel, text=label).grid(row=row, column=0, sticky="w")
             entry = ttk.Entry(panel, width=35)
             entry.grid(row=row, column=1, sticky="ew", pady=2)
-            entry.insert(0, str(app.config[key]))
+            entry.insert(0, value)
             self.fields[key] = entry
+        ttk.Label(panel, text="Use host:port or [IPv6]:port. The default port is 23.").grid(
+            row=2, columnspan=2, sticky="w")
         ttk.Label(panel, text="Macros  ·  $OPERATOR defaults to the login callsign").grid(
             row=3, columnspan=2, sticky="w", pady=(12, 4))
         self.macros = dict(app.config["macros"])
@@ -257,7 +261,8 @@ class Settings:
         for label, action in [("Add", lambda: self.edit(True)), ("Edit", lambda: self.edit(False)),
                               ("Remove", self.remove)]:
             ttk.Button(actions, text=label, command=action).pack(side="left")
-        ttk.Button(actions, text="Save settings", command=self.commit).pack(side="right")
+        self.save_button = ttk.Button(actions, text="Save settings", command=self.commit)
+        self.save_button.pack(side="right")
         panel.columnconfigure(1, weight=1)
         panel.rowconfigure(4, weight=1)
 
@@ -292,15 +297,41 @@ class Settings:
             self.refresh()
 
     def commit(self):
-        host, port, call = (self.fields[k].get().strip() for k in ("host", "port", "call"))
-        if (not host or any(ch.isspace() for ch in host) or not port.isascii() or
-                not port.isdecimal() or len(port) > 5 or not 1 <= int(port) <= 65535 or
-                not re.fullmatch(r"[A-Za-z0-9/\-]+", call)):
-            messagebox.showerror("Node settings", "Enter a hostname, port (1–65535), and login callsign.", parent=self.window)
+        call = self.fields["call"].get().strip()
+        if not re.fullmatch(r"[A-Za-z0-9/\-]+", call):
+            messagebox.showerror("Node settings", "Enter your login callsign.", parent=self.window)
             return
-        if self.app.persist(host=host, port=int(port), call=call.upper(), macros=self.macros):
-            self.app.show_destination()
-            self.window.destroy()
+        address = self.fields["address"].get()
+        for field in (*self.fields.values(), self.save_button):
+            field.state(["disabled"])
+        self.save_button.configure(text="Checking address…")
+        result = queue.Queue()
+
+        def check():
+            try:
+                result.put(validate_address(address))
+            except ValueError as exc:
+                result.put(exc)
+
+        def finish():
+            try:
+                endpoint = result.get_nowait()
+            except queue.Empty:
+                self.window.after(50, finish)
+                return
+            for field in (*self.fields.values(), self.save_button):
+                field.state(["!disabled"])
+            self.save_button.configure(text="Save settings")
+            if isinstance(endpoint, ValueError):
+                messagebox.showerror("Node settings", str(endpoint), parent=self.window)
+                return
+            host, port = endpoint
+            if self.app.persist(host=host, port=port, call=call.upper(), macros=self.macros):
+                self.app.show_destination()
+                self.window.destroy()
+
+        threading.Thread(target=check, daemon=True).start()
+        self.window.after(50, finish)
 
 
 def main():
