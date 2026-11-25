@@ -19,6 +19,8 @@ Install Python 3.10 or newer with Tk. Run `python dxspider.py` from this directo
 
 ## Macros and presets
 
+Saved scripts live in the `scripts` section of `settings.json`, alongside node settings and macros. On Windows the file is in `%APPDATA%\DXSpider Filters`, on macOS in `~/Library/Application Support/DXSpider Filters`, and on Linux in `$XDG_CONFIG_HOME/DXSpider Filters` (normally `~/.config/DXSpider Filters`). To remove a saved script, select it, click **Delete…**, and confirm. Deletion affects the local library only.
+
 Use `$OPERATOR` for the login callsign. Add an OPERATOR entry in the macro table to override it. The starter scripts use `$LOCALSTATES` and `$SSBSTATES` for their spotter regions. Macro names are case sensitive and values are literal text. Undefined macros stop Apply before login.
 
 The starter library comes from `samplescripts.txt`. Each preset clears spot and RBN filters and explicitly enables `seeme`. WRT interprets the missing mode in the sample as CW. Saved scripts can change any of these settings.

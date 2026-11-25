@@ -40,6 +40,8 @@ class App:
         for label, action in [("New", lambda: self.select(None)), ("Save", self.save_script),
                               ("Save as…", lambda: self.save_script(True))]:
             ttk.Button(bar, text=label, command=action).pack(side="left", padx=(5, 0))
+        self.delete_button = ttk.Button(bar, text="Delete…", command=self.delete_script)
+        self.delete_button.pack(side="left", padx=(5, 0))
         self.editor = ScrolledText(frame, wrap="none", height=12, undo=True)
         self.editor.pack(fill="both", expand=True, pady=8)
         actions = ttk.Frame(frame)
@@ -73,13 +75,30 @@ class App:
         if not self.can_discard():
             self.choice.set(self.current or "")
             return
+        self.load_script(name)
+
+    def load_script(self, name, draft=None):
         self.current = name
         self.original = self.config["scripts"].get(name, "")
         self.editor.delete("1.0", "end")
-        self.editor.insert("1.0", self.original)
+        self.editor.insert("1.0", self.original if draft is None else draft)
         self.editor.edit_reset()
         self.choice.configure(values=list(self.config["scripts"]))
         self.choice.set(name or "")
+        self.delete_button.state(["disabled" if name is None else "!disabled"])
+
+    def delete_script(self):
+        name = self.current
+        if name is None:
+            return
+        question = f"Delete “{name}” from your local script library?"
+        if self.content() != self.original:
+            question += "\nThis also discards your unsaved edits to this script."
+        if messagebox.askyesno("Delete script", question, default="no", parent=self.root):
+            remaining = self.config["scripts"].copy()
+            del remaining[name]
+            if self.persist(scripts=remaining):
+                self.load_script(next(iter(remaining), None))
 
     def persist(self, **changes):
         updated = {**self.config, **changes}
@@ -187,12 +206,7 @@ class App:
                 self.capture_button.state(["!disabled"])
                 if kind == "captured":
                     if self.can_discard():
-                        self.current = None
-                        self.original = ""
-                        self.choice.set("")
-                        self.editor.delete("1.0", "end")
-                        self.editor.insert("1.0", value)
-                        self.editor.edit_reset()
+                        self.load_script(None, draft=value)
                         value = "Captured configuration · disconnected"
                     else:
                         self.log("Captured script\n" + value)
