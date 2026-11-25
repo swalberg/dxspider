@@ -5,6 +5,7 @@ import threading
 import unittest
 from pathlib import Path
 
+from capture import capture_configuration, filter_commands, station_commands
 from library import defaults, expand, save
 from session import apply_commands
 
@@ -32,7 +33,7 @@ class LibraryTests(unittest.TestCase):
 
 
 class SessionTests(unittest.TestCase):
-    def simulate(self, responses):
+    def simulate(self, responses, capture=False):
         prompt = b"W1TEST de NODE-2 24-Nov-2026 1420Z dxspider >"
         received, log, errors = [], [], []
         listener = socket.socket()
@@ -53,14 +54,21 @@ class SessionTests(unittest.TestCase):
                         received.append(stream.readline().decode().strip())
                         if reply is None:
                             return
-                        client.sendall(b"\r\n" + reply + b"\r\n" + prompt)
+                        pages = reply if isinstance(reply, tuple) else (reply,)
+                        for page in pages[:-1]:
+                            client.sendall(b"\r\n" + page + b"\r\nPress Enter to continue, A to abort (2 lines) >")
+                            self.assertEqual(stream.readline(), b"\r\n")
+                        client.sendall(b"\r\n" + pages[-1] + b"\r\n" + prompt)
                     self.assertEqual(stream.read(1), b"")
             except Exception as exc:
                 errors.append(exc)
 
         worker = threading.Thread(target=server, daemon=True)
         worker.start()
-        result = apply_commands("127.0.0.1", port, "W1TEST", ["one", "two", "three"], log.append, 2)
+        if capture:
+            result = capture_configuration("127.0.0.1", port, "W1TEST", log.append, 2)
+        else:
+            result = apply_commands("127.0.0.1", port, "W1TEST", ["one", "two", "three"], log.append, 2)
         worker.join(4)
         self.assertFalse(worker.is_alive())
         if errors:
@@ -82,3 +90,24 @@ class SessionTests(unittest.TestCase):
         _, log, _ = self.simulate([None])
         self.assertIn("Outcome unknown · one", log)
         self.assertIn("Not sent\ntwo\nthree", log)
+
+    def test_capture_and_close(self):
+        received, log, script = self.simulate([
+            (b"W1TEST : spots\r\n filter3 reject not by_state PA",
+             b"DX de W9ABC: 14001 W2XYZ\r\nW1TEST : rbn\r\n filter0 accept call W1TEST"),
+            b"Want RBN spots: Yes\r\nRBN See Me: No\r\nWant RBN CW: Yes\r\n"
+            b"Want RBN Beacon: No\r\nWant RBN RTTY: Yes\r\nWant RBN FT4/8: No\r\nWant RBN PSK: No"
+        ], capture=True)
+        self.assertEqual(received, ["show/filter spots rbn", "stat/user"])
+        self.assertEqual(script.splitlines(), ["clear/spots all", "clear/rbn all",
+                         "reject/spots 3 not by_state PA", "accept/rbn 0 call W1TEST",
+                         "set/skimmer cw rtty", "unset/seeme"])
+        self.assertNotIn("Omitted", log)
+
+    def test_capture_requires_recognizable_filters(self):
+        with self.assertRaises(ValueError):
+            filter_commands("Unknown command", "W1TEST")
+        self.assertEqual(filter_commands("No filters defined for W1TEST", "W1TEST"),
+                         ["clear/spots all", "clear/rbn all"])
+        self.assertEqual(station_commands("Want RBN spots: Yes\nWant RBN CW: Yes"),
+                         ([], ["skimmer modes", "See Me"]))

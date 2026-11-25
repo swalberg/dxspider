@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 
+from capture import capture_configuration
 from library import NAME, defaults, expand, save, settings_file
 from session import apply_commands
 
@@ -45,6 +46,9 @@ class App:
         actions.pack(fill="x")
         self.apply_button = ttk.Button(actions, text="Apply", command=self.apply)
         self.apply_button.pack(side="right")
+        self.capture_button = ttk.Button(actions, text="Capture from node",
+                                         command=lambda: self.start_session(capture=True))
+        self.capture_button.pack(side="right", padx=6)
         for label, action in [("Preview", self.preview), ("Copy expanded commands", self.copy)]:
             ttk.Button(actions, text=label, command=action).pack(side="left", padx=(0, 6))
         self.status = ttk.Label(frame, text="Offline")
@@ -133,25 +137,36 @@ class App:
                 self.status.configure(text="Expanded commands copied")
 
     def apply(self):
+        self.start_session(capture=False)
+
+    def start_session(self, capture):
         if self.running:
             return
         if not self.config["call"]:
             messagebox.showinfo("Callsign required", "Enter your login callsign in Settings.")
             self.settings()
             return
-        commands = self.commands()
-        if not commands:
-            return
+        if not capture:
+            commands = self.commands()
+            if not commands:
+                return
         c = self.config
         self.running = True
         self.apply_button.state(["disabled"])
-        self.status.configure(text="Applying script…")
+        self.capture_button.state(["disabled"])
+        self.status.configure(text="Reading configuration…" if capture else "Applying script…")
         self.log(f"{c['call']} @ {c['host']}:{c['port']}", clear=True)
 
         def work():
+            def report(msg):
+                self.events.put(("log", msg))
+
             try:
-                result = apply_commands(c["host"], c["port"], c["call"], commands,
-                                        lambda msg: self.events.put(("log", msg)))
+                if capture:
+                    script = capture_configuration(c["host"], c["port"], c["call"], report)
+                    self.events.put(("captured", script))
+                    return
+                result = apply_commands(c["host"], c["port"], c["call"], commands, report)
             except Exception as exc:
                 result = f"Stopped · {exc}"
             self.events.put(("done", result))
@@ -166,15 +181,28 @@ class App:
             except queue.Empty:
                 self.root.after(40, self.poll)
                 return
-            if kind == "done":
+            if kind in ("done", "captured"):
                 self.running = False
                 self.apply_button.state(["!disabled"])
+                self.capture_button.state(["!disabled"])
+                if kind == "captured":
+                    if self.can_discard():
+                        self.current = None
+                        self.original = ""
+                        self.choice.set("")
+                        self.editor.delete("1.0", "end")
+                        self.editor.insert("1.0", value)
+                        self.editor.edit_reset()
+                        value = "Captured configuration · disconnected"
+                    else:
+                        self.log("Captured script\n" + value)
+                        value = "Capture in transcript · disconnected"
                 self.status.configure(text=value)
                 return
             self.log(value)
 
     def close(self):
-        if self.running and not messagebox.askyesno("Apply in progress", "Exit during this session?"):
+        if self.running and not messagebox.askyesno("Session in progress", "Exit during this session?"):
             return
         if self.can_discard():
             self.root.destroy()

@@ -6,6 +6,7 @@ import time
 
 LOGIN = re.compile(r"(?:^|\n)[ \t]*(?:\w+[ \t]+)?(?:login|callsign|call sign):[ \t]*", re.I)
 PASSWORD = re.compile(r"(?:^|\n)[ \t]*password:[ \t]*", re.I)
+PAGE = re.compile(r"(?:^|\n)Press Enter to continue, A to abort \(\d+ lines\) >", re.I)
 ERROR = re.compile(
     r"^(?:sorry\b|error\b|syntax\b|usage\b|invalid\b|unknown\b|bad\b|"
     r"not allowed\b|permission denied\b|you must\b|you are not\b|"
@@ -51,12 +52,15 @@ class Reader:
         return plain.decode("latin-1").replace("\r", "").replace("\x00", "")
 
     def until(self, pattern):
+        return self.read_until(pattern)[0]
+
+    def read_until(self, pattern):
         deadline = time.monotonic() + self.timeout
         while True:
             match = pattern.search(self.pending)
             if match:
                 reply, self.pending = self.pending[:match.start()], self.pending[match.end():]
-                return reply.strip()
+                return reply.strip(), match
             if PASSWORD.search(self.pending):
                 raise OSError("The node requires a password.")
             remaining = deadline - time.monotonic()
@@ -68,24 +72,39 @@ class Reader:
                 raise OSError("The node closed the connection.")
             self.pending += self.decode(data)
 
+    def login(self, call):
+        self.until(LOGIN)
+        self.sock.sendall((call + "\r\n").encode("ascii"))
+        self.prompt = re.compile(r"(?:^|\n)[ \t]*" + re.escape(call) +
+                                 r"[ \t]+de[ \t]+[^\n>]+>", re.I)
+        self.until(self.prompt)
+
+    def query(self, command):
+        self.sock.sendall((command + "\r\n").encode("ascii"))
+        terminator = re.compile(f"(?:{self.prompt.pattern})|(?P<page>{PAGE.pattern})", re.I)
+        pages = []
+        for _ in range(100):
+            reply, match = self.read_until(terminator)
+            pages.append(reply)
+            if not match["page"]:
+                return "\n".join(pages)
+            self.sock.sendall(b"\r\n")
+        raise ValueError("Too many pages in configuration reply.")
+
 
 def apply_commands(host, port, call, commands, report, timeout=10):
-    prompt = re.compile(r"(?:^|\n)[ \t]*" + re.escape(call) +
-                        r"[ \t]+de[ \t]+[^\n>]+>", re.I)
     next_index = 0
     active = None
     reader = None
     try:
         with socket.create_connection((host, port), timeout=timeout) as sock:
             reader = Reader(sock, timeout)
-            reader.until(LOGIN)
-            sock.sendall((call + "\r\n").encode("ascii"))
-            reader.until(prompt)
+            reader.login(call)
             for index, command in enumerate(commands):
                 active = command
                 next_index = index + 1
                 sock.sendall((command + "\r\n").encode("ascii"))
-                reply = reader.until(prompt)
+                reply = reader.until(reader.prompt)
                 active = None
                 lines = [line.strip() for line in reply.splitlines()
                          if line.strip() != command and not line.startswith("DX de ")]

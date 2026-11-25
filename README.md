@@ -15,6 +15,8 @@ Install Python 3.10 or newer with Tk. Run `python dxspider.py` from this directo
 3. **Preview** displays expanded commands. **Copy expanded commands** puts them on the clipboard for use in N1MM or a terminal.
 4. Click **Apply** to open a callsign-only Telnet session. The app sends the visible editor contents one command at a time, waiting for your callsign's DXSpider prompt between commands. It closes the socket after the final reply, an error, or a timeout.
 
+**Capture from node** reads the current callsign’s outgoing spot and RBN filters and available skimmer and See Me settings in one short session. The app queries `show/filter spots rbn` and `stat/user`, follows English pagination prompts, and opens the captured commands as an unsaved script in the editor. You can edit, copy, save, or apply it. The transcript flags unavailable station settings. If you keep unsaved edits when prompted, the captured script appears in the transcript instead.
+
 ## Macros and presets
 
 Use `$OPERATOR` for the login callsign. Add an OPERATOR entry in the macro table to override it. The starter scripts use `$LOCALSTATES` and `$SSBSTATES` for their spotter regions. Macro names are case sensitive and values are literal text. Undefined macros stop Apply before login.
