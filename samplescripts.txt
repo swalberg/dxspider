@@ -1,0 +1,42 @@
+CWT
+
+clear/spots all
+clear/rbn all
+set/skimmer cw
+set/seeme
+acc/spot 0 call N3RTW
+rej/spot 1 info ft8 or info ft4 or info rtt or info ssb
+rej/spot 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+acc/rbn 0 call N3RTW
+rej/rbn 1 info ft8 or info ft4 or info rtt
+rej/rbn 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+
+Normal DX
+clear/spots all
+clear/rbn all
+set/skimmer cw
+rej/spot 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/rbn 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+
+WRT
+clear/spots all
+clear/rbn all
+set/skimmer rtty
+set/seeme
+acc/spot 0 call N3RTW
+rej/spot 1 info ft8 or info ft4 or info or info ssb
+rej/spot 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+acc/rbn 0 call N3RTW
+rej/rbn 1 info ft8 or info ft4 or info ssb
+rej/rbn 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+
+Sweepstakes SSB
+clear/spots all
+clear/rbn all
+unset/skimmer
+acc/spot 0 call N3RTW
+rej/spot 1 info ft8 or info ft4 or info rtt or info cw
+rej/spot 2 not dxcc w,ve,kh6,kl,kp2,kp4
+rej/spot 3 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spot 4 not (on 1815/1910 or on 3650/3925 or on 7128/7295 or on 14152/14345 or on 21203/21445 or on 28303/28850)
+
