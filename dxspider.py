@@ -10,6 +10,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from capture import capture_configuration
 from library import NAME, defaults, expand, save, settings_file
+from macro_completion import MacroCompletion
 from node_address import format_address, validate_address
 from session import apply_commands
 
@@ -45,6 +46,7 @@ class App:
         self.delete_button.pack(side="left", padx=(5, 0))
         self.editor = ScrolledText(frame, wrap="none", height=12, undo=True)
         self.editor.pack(fill="both", expand=True, pady=8)
+        self.completion = MacroCompletion(self.editor, lambda: ["OPERATOR", *self.config["macros"]])
         actions = ttk.Frame(frame)
         actions.pack(fill="x")
         self.apply_button = ttk.Button(actions, text="Apply", command=self.apply)
@@ -79,6 +81,7 @@ class App:
         self.load_script(name)
 
     def load_script(self, name, draft=None):
+        self.completion.hide()
         self.current = name
         self.original = self.config["scripts"].get(name, "")
         self.editor.delete("1.0", "end")

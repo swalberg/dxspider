@@ -19,6 +19,8 @@ Install Python 3.10 or newer with Tk. Run `python dxspider.py` from this directo
 
 ## Macros and presets
 
+Type `$` in the script editor to list available macros. Keep typing to narrow the list, use **Up** or **Down** to select a name, and press **Tab** to insert it. **Esc** dismisses the suggestions.
+
 Saved scripts live in the `scripts` section of `settings.json`, alongside node settings and macros. On Windows the file is in `%APPDATA%\DXSpider Filters`, on macOS in `~/Library/Application Support/DXSpider Filters`, and on Linux in `$XDG_CONFIG_HOME/DXSpider Filters` (normally `~/.config/DXSpider Filters`). To remove a saved script, select it, click **Delete…**, and confirm. Deletion affects the local library only.
 
 Use `$OPERATOR` for the login callsign. Add an OPERATOR entry in the macro table to override it. The starter scripts use `$LOCALSTATES` and `$SSBSTATES` for their spotter regions. Macro names are case sensitive and values are literal text. Undefined macros stop Apply before login.
