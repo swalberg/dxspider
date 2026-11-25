@@ -83,7 +83,7 @@ class App:
         self.editor.delete("1.0", "end")
         self.editor.insert("1.0", self.original if draft is None else draft)
         self.editor.edit_reset()
-        self.choice.configure(values=list(self.config["scripts"]))
+        self.choice.configure(values=sorted(self.config["scripts"], key=str.casefold))
         self.choice.set(name or "")
         self.delete_button.state(["disabled" if name is None else "!disabled"])
 
