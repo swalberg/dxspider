@@ -49,13 +49,15 @@ class App:
         self.completion = MacroCompletion(self.editor, lambda: ["OPERATOR", *self.config["macros"]])
         actions = ttk.Frame(frame)
         actions.pack(fill="x")
+        ttk.Button(actions, text="Preview", command=self.preview).pack(side="left", padx=(0, 6))
         self.apply_button = ttk.Button(actions, text="Apply", command=self.apply)
-        self.apply_button.pack(side="right")
-        self.capture_button = ttk.Button(actions, text="Capture from node",
+        self.apply_button.pack(side="left")
+        right_actions = ttk.Frame(actions)
+        right_actions.pack(side="right")
+        ttk.Button(right_actions, text="Copy expanded commands", command=self.copy).pack(side="left", padx=(0, 6))
+        self.capture_button = ttk.Button(right_actions, text="Capture from node",
                                          command=lambda: self.start_session(capture=True))
-        self.capture_button.pack(side="right", padx=6)
-        for label, action in [("Preview", self.preview), ("Copy expanded commands", self.copy)]:
-            ttk.Button(actions, text=label, command=action).pack(side="left", padx=(0, 6))
+        self.capture_button.pack(side="left")
         self.status = ttk.Label(frame, text="Offline")
         self.status.pack(anchor="w", pady=(12, 4))
         self.output = ScrolledText(frame, height=8, wrap="word", state="disabled")
