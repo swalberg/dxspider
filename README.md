@@ -43,3 +43,7 @@ git push origin v1.0.0
 ```
 
 Tags starting with `v` run the same test matrix. After the tests pass, the release workflow builds the x64 executable on Windows, checks that it opens the editor with the bundled starter script, and attaches it to a GitHub Release.
+
+## Acknowledgements
+
+Alan H, WA3EKL, gave me this idea when he generously shared his scripts with the PVRC group. The bones of the sample scripts that ship with this come from his posts.
