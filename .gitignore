@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 .venv/
+build/
+dist/
+/DXSpider-Filters-Windows-x64.spec

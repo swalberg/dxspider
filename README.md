@@ -4,6 +4,10 @@ A desktop script library for configuring a DXSpider node from Windows, macOS, or
 
 ## Run
 
+On 64-bit Windows, download **DXSpider-Filters-Windows-x64.exe** from the repository’s **Releases** page and double-click it. The executable includes Python, Tk, and the starter scripts.
+
+### Run from source
+
 Install Python 3.10 or newer with Tk. Run `python dxspider.py` from this directory (on macOS or Linux, use `python3 dxspider.py`). Linux distributions may package Tk separately, for example as `python3-tk`.
 
 1. Open **Settings**, enter your login callsign, and save. The default node is `w3lpl.net:7373`. The app remembers the host, port, callsign, macro values, and script library in your user configuration directory.
@@ -22,3 +26,14 @@ The starter library comes from `samplescripts.txt`. Each preset clears spot and 
 The results show each command and its reply. The app stops on recognized English rejection messages. DXSpider replies are free text, so review unfamiliar responses in the transcript. A lost reply leaves the in-flight command's outcome unknown. Earlier commands may already have changed filters. The app lists the remaining commands and leaves retrying to the operator.
 
 Run the local tests with `python -m unittest -v`. The session tests use a loopback node.
+
+## GitHub Actions
+
+Branch pushes and pull requests run the tests on Windows, macOS, and Linux. To publish a Windows release, tag the desired commit and push the tag. For example:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Tags starting with `v` run the same test matrix. After the tests pass, the release workflow builds the x64 executable on Windows, checks that it opens the editor with the bundled starter script, and attaches it to a GitHub Release.

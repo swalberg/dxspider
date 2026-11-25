@@ -2,6 +2,7 @@
 import json
 import queue
 import re
+import sys
 import threading
 import tkinter as tk
 from tkinter import messagebox, simpledialog, ttk
@@ -263,6 +264,14 @@ class Settings:
 def main():
     root = tk.Tk()
     path = settings_file()
+    if sys.argv[1:] == ["--smoke-test"]:
+        root.withdraw()
+        app = App(root, defaults(), path)
+        root.update_idletasks()
+        if not app.content().startswith("clear/spots all"):
+            raise RuntimeError("The packaged editor did not load its starter script.")
+        root.destroy()
+        return
     try:
         config = json.loads(path.read_text(encoding="utf-8")) if path.exists() else defaults()
         App(root, config, path)
