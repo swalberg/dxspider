@@ -1,13 +1,12 @@
 CWT
-
 clear/spots all
 clear/rbn all
 set/skimmer cw
 set/seeme
-acc/spot 0 call N3RTW
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
 rej/spot 1 info ft8 or info ft4 or info rtt or info ssb
 rej/spot 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
-acc/rbn 0 call N3RTW
 rej/rbn 1 info ft8 or info ft4 or info rtt
 rej/rbn 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
 
@@ -15,6 +14,9 @@ Normal DX
 clear/spots all
 clear/rbn all
 set/skimmer cw
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
 rej/spot 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
 rej/rbn 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
 
@@ -23,10 +25,10 @@ clear/spots all
 clear/rbn all
 set/skimmer rtty
 set/seeme
-acc/spot 0 call N3RTW
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
 rej/spot 1 info ft8 or info ft4 or info or info ssb
 rej/spot 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
-acc/rbn 0 call N3RTW
 rej/rbn 1 info ft8 or info ft4 or info ssb
 rej/rbn 3 not by_state PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
 
@@ -34,9 +36,109 @@ Sweepstakes SSB
 clear/spots all
 clear/rbn all
 unset/skimmer
-acc/spot 0 call N3RTW
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
 rej/spot 1 info ft8 or info ft4 or info rtt or info cw
 rej/spot 2 not dxcc w,ve,kh6,kl,kp2,kp4
 rej/spot 3 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
 rej/spot 4 not (on 1815/1910 or on 3650/3925 or on 7128/7295 or on 14152/14345 or on 21203/21445 or on 28303/28850)
 
+Sweepstakes CW
+clear/spots all
+clear/rbn all
+set/skimmer cw
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 info ft8 or info ft4 or info rtt
+rej/spot 2 not dxcc w,ve,kh6,kl,kp2,kp4
+rej/spot 3 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spot 4 not (on 1801/1860 or on 3501/3580 or on 7001/7100 or on 14001/14100 or on 21001/21100 or on 28001/28100)
+rej/rbn 1 info ft8 or info ft4 or info rtt
+rej/rbn 2 not dxcc w,ve,kh6,kl,kp2,kp4
+rej/rbn 3 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/rbn 4 not (on 1801/1860 or on 3501/3580 or on 7001/7100 or on 14001/14100 or on 21001/21100 or on 28001/28100)
+
+WAE RTTY
+clear/spots all
+clear/rbn all
+set/skimmer rtty
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 info ft8 or info ft4
+rej/spot 2 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spot 3 not (on 3570/3595 or on 7030/7100 or on 14075/14095 or on 14105/14140 or on 21080/21150 or on 28080/28150)
+rej/rbn 1 info ft8 or info ft4
+rej/rbn 2 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/rbn 3 not (on 3570/3595 or on 7030/7100 or on 14075/14095 or on 14105/14140 or on 21080/21150 or on 28080/28150)
+
+CQWW SSB
+clear/spots all
+clear/rbn all
+unset/skimmer
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spot 2 not (call_dxcc w and call_zone 3,4,5 or not call_dxcc w)
+rej/spot 3 not (on 1815/1910 or on 3540/3925 or on 7030/7100 or on 7128/7290 or on 14152/14347 or on 21203/21447 or on 28303/28850)
+rej/spot 4 info ft8 or info ft4 or info rtt
+
+California QSO Party
+clear/spots all
+clear/rbn all
+set/skimmer cw
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spot 2 not state CA
+rej/spot 3 not (on 160m or on 80m or on 40m or on 20m or on 15m or on 10m)
+rej/spot 4 info ft8 or info ft4 or info rtt
+
+Makrothen RTTY
+clear/spots all
+clear/rbn all
+set/skimmer rtty
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spot 2 not (on 3580/3595 or on 7035/7120 or on 14080/14125 or on 21080/21130 or on 28080/28150)
+rej/spot 3 (info ft8 or info ft4)
+
+Pennsylvania QSO Party
+clear/spots all
+clear/rbn all
+set/skimmer cw
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spot 2 not state PA
+rej/spot 3 not (on 160m or on 80m or on 40m or on 20m or on 15m or on 10m or on 6m or on 2m)
+rej/spot 4 info ft8 or info ft4 or info rtt
+
+NAQP CW
+clear/spots all
+clear/rbn all
+set/skimmer
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spots 2 not call_dxcc w,k,ve,kp2,kp4,kl,kh6,mx
+rej/spot 3 not on 1801/1890,3501/3600,7001/7125,14001/14150,21001/21200,28001/28300
+
+ARRL DX SSB
+clear/spots all
+clear/rbn all
+set/skimmer
+set/seeme
+acc/spot 0 call $OPERATOR
+acc/rbn 0 call $OPERATOR
+rej/spot 1 not by_state ME,MA,NH,VT,RI,CT,NJ,DE,PA,MD,VA,NC,SC,GA,OH,WV,KY,TN
+rej/spots 2 call_dxcc w and not call_dxcc ve,mx,kp2,kp4,kl,kh6
+rej/spot 3 not on 1801/1890,3603/3950,7128/7297,14152/14347,21203/21447,28303/28900

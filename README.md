@@ -69,7 +69,13 @@ Saved scripts live in the `scripts` section of `settings.json`, alongside node s
 
 Use `$OPERATOR` for the login callsign. Add an OPERATOR entry in the macro table to override it. The starter scripts use `$LOCALSTATES` and `$SSBSTATES` for their spotter regions. Macro names are case sensitive and values are literal text. Undefined macros stop Apply before login.
 
-The starter library comes from `samplescripts.txt`. Each preset clears spot and RBN filters and explicitly enables `seeme`. WRT interprets the missing mode in the sample as CW. Saved scripts can change any of these settings.
+The starter library comes from `samplescripts.txt`, including the [WA3EKL scripts published by PVRC for W3LPL](https://www.pvrc.org/w3lpl-dxspider-scripts/). It includes CWT, Normal DX, WRT, Sweepstakes CW and SSB, WAE RTTY, CQWW SSB, California and Pennsylvania QSO Parties, Makrothen RTTY, NAQP CW, and ARRL DX SSB.
+
+Each preset clears spot and RBN filters, enables `set/seeme`, and accepts spots of `$OPERATOR` in slot 0 for both spot and RBN filters, ahead of the numbered rejection rules. These settings let you receive spots of your own callsign; they do not publish a spot. The self-call exceptions bypass the preset's regional, mode, and contest filters. Saved scripts can change any of these settings.
+
+The added presets preserve the published filter commands and skimmer settings, with the reset and self-call additions above. In particular, ARRL DX SSB retains the source's `set/skimmer`, and WAE RTTY has no explicit Europe-only filter despite the source description. Some published presets have only spot rejection rules, without matching RBN rejection rules. Review and adjust these for your operation. WRT interprets the missing mode in the original sample as CW.
+
+Starter updates apply to new libraries only. Existing saved scripts, deleted presets, and custom macros are preserved. To add a new preset to an existing library, copy its commands from `samplescripts.txt` into **New** and use **Save as…**; `$OPERATOR` uses your configured callsign.
 
 ## Session results
 

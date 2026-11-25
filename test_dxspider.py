@@ -14,11 +14,17 @@ class LibraryTests(unittest.TestCase):
     def test_starters_and_storage(self):
         config = defaults()
         config["call"] = "W1TEST"
-        self.assertEqual(list(config["scripts"]), ["CWT", "Normal DX", "WRT", "Sweepstakes SSB"])
+        self.assertEqual(list(config["scripts"]), [
+            "CWT", "Normal DX", "WRT", "Sweepstakes SSB", "Sweepstakes CW",
+            "WAE RTTY", "CQWW SSB", "California QSO Party", "Makrothen RTTY",
+            "Pennsylvania QSO Party", "NAQP CW", "ARRL DX SSB",
+        ])
         for script in config["scripts"].values():
             commands = expand(script, config)
             self.assertEqual(commands[:2], ["clear/spots all", "clear/rbn all"])
             self.assertIn("set/seeme", commands)
+            self.assertEqual(commands.count("acc/spot 0 call W1TEST"), 1)
+            self.assertEqual(commands.count("acc/rbn 0 call W1TEST"), 1)
             self.assertNotIn("$", "\n".join(commands))
         self.assertIn("acc/spot 0 call W1TEST", expand(config["scripts"]["CWT"], config))
         self.assertIn("info cw or info ssb", config["scripts"]["WRT"])
