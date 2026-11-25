@@ -4,7 +4,7 @@ A desktop script library for configuring a DXSpider node from Windows, macOS, or
 
 ## Run
 
-On 64-bit Windows, download **DXSpider-Filters-Windows-x64.exe** from the repository’s **Releases** page and double-click it. The executable includes Python, Tk, and the starter scripts.
+On 64-bit Windows, download the versioned executable from the repository’s **Releases** page and double-click it. For example, release `v1.0.0` provides `DXSpider-Filters-v1.0.0-Windows-x64.exe`. The executable includes Python, Tk, and the starter scripts.
 
 ### Run from source
 
